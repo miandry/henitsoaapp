@@ -53,7 +53,7 @@ const baseItems = [
   { path: '/app/dashboard', label: 'Tableau de bord', icon: icons.dashboard },
   { path: '/app/eleves-inscrits', label: 'Les Eleves inscript', icon: icons.eleves },
   { path: '/app/classes', label: 'Les classes', icon: icons.classes },
-  { path: '/app/archives-eleves', label: 'Les archives des élèves', icon: icons.archives },
+  { path: '/app/archives-eleves', label: 'Fiche des élèves', icon: icons.archives },
   { path: '/app/matieres', label: 'Les matieres', icon: icons.matieres },
   { path: '/app/gestion-ecolages', label: 'Gestion des ecolages', icon: icons.ecolageGestion },
   { path: '/app/suivi-ecolages', label: 'Suivi des ecolages', icon: icons.ecolageSuivi },

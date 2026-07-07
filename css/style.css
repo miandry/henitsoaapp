@@ -298,13 +298,24 @@ button.btn-add:hover {
 }
 
 button.btn-primary,
-button.btn-secondary {
+button.btn-secondary,
+a.btn-secondary {
   padding: 9px 16px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1.25;
+  font-family: inherit;
+}
+
+button.btn-secondary--sm,
+a.btn-secondary--sm {
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 button.btn-primary {
@@ -321,13 +332,15 @@ button.btn-primary:disabled {
   cursor: not-allowed;
 }
 
-button.btn-secondary {
+button.btn-secondary,
+a.btn-secondary {
   background: #fff;
   color: var(--color-text);
   border-color: var(--color-border);
 }
 
-button.btn-secondary:hover {
+button.btn-secondary:hover,
+a.btn-secondary:hover {
   background: var(--color-bg);
 }
 
@@ -468,6 +481,14 @@ button.btn-secondary:hover {
 
 .detail-header__info {
   min-width: 0;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .detail-photo {

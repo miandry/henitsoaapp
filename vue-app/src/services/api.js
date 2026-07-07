@@ -36,6 +36,14 @@ export function createInscription(payload) {
   return authenticatedPost('/api/inscriptions', payload)
 }
 
+export function getInscriptionFormOptions() {
+  return api.get('/api/inscriptions/form-options')
+}
+
+export function getDashboardStats() {
+  return api.get('/api/dashboard')
+}
+
 export function getArchives(params = {}) {
   return api.get('/api/archives', { params })
 }
@@ -78,6 +86,10 @@ export function createEcolage(payload) {
 
 export function getInscriptionDetail(id) {
   return api.get(`/api/inscriptions/${id}`)
+}
+
+export function updateInscription(id, payload) {
+  return authenticatedPatch(`/api/inscriptions/${id}`, payload)
 }
 
 export function getArchiveDetail(id) {

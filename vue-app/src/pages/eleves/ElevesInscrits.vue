@@ -73,9 +73,31 @@
           </select>
         </div>
 
+        <div class="form-field">
+          <label for="ins-droit">Droit d'inscription</label>
+          <select id="ins-droit" v-model="newDroitInscription" required>
+            <option value="" disabled>Sélectionner</option>
+            <option v-for="d in droitsInscription" :key="d.value" :value="d.value">{{ d.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="ins-date-payement">Date de paiement</label>
+          <input id="ins-date-payement" v-model="newDatePayement" type="date" required />
+        </div>
+
+        <div class="form-field">
+          <label for="ins-montant">Montant (Ar)</label>
+          <input id="ins-montant" v-model.number="newMontant" type="number" min="0" placeholder="ex. 30000" required />
+        </div>
+
         <div class="form-actions">
           <button type="button" class="btn-secondary" @click="closeCreate">Annuler</button>
-          <button type="submit" class="btn-primary" :disabled="creating || !newEleve || !newClasseTid || !newAnnee">
+          <button
+            type="submit"
+            class="btn-primary"
+            :disabled="creating || !newEleve || !newClasseTid || !newAnnee || !newDroitInscription || !newDatePayement || newMontant === null || newMontant < 0"
+          >
             {{ creating ? 'Création...' : 'Créer' }}
           </button>
         </div>
@@ -86,7 +108,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getInscriptions, createInscription, getClasses } from '../../services/api.js'
+import { getInscriptions, createInscription, getClasses, getInscriptionFormOptions } from '../../services/api.js'
 import { useInfiniteList } from '../../composables/useInfiniteList.js'
 import Modal from '../../components/Modal.vue'
 import StudentAutocomplete from '../../components/StudentAutocomplete.vue'
@@ -105,8 +127,12 @@ const showCreate = ref(false)
 const newEleve = ref(null)
 const newClasseTid = ref('')
 const newAnnee = ref('')
+const newDroitInscription = ref('')
+const newDatePayement = ref('')
+const newMontant = ref(null)
 const classes = ref([])
 const anneesScolaires = ref([])
+const droitsInscription = ref([])
 const creating = ref(false)
 const createError = ref('')
 
@@ -125,15 +151,22 @@ async function openCreate() {
   newEleve.value = null
   newClasseTid.value = ''
   newAnnee.value = ''
+  newDroitInscription.value = ''
+  newDatePayement.value = ''
+  newMontant.value = null
   createError.value = ''
   showCreate.value = true
   try {
-    const { data } = await getClasses({})
-    classes.value = data.items || []
-    anneesScolaires.value = data.annees_scolaires || []
-    newAnnee.value = data.annee_scolaire || ''
+    const [classesRes, formRes] = await Promise.all([
+      getClasses({}),
+      getInscriptionFormOptions()
+    ])
+    classes.value = classesRes.data.items || []
+    anneesScolaires.value = formRes.data.annees_scolaires || classesRes.data.annees_scolaires || []
+    droitsInscription.value = formRes.data.droits_inscription || []
+    newAnnee.value = formRes.data.annee_scolaire || classesRes.data.annee_scolaire || anneesScolaires.value[0] || ''
   } catch (e) {
-    createError.value = "Impossible de charger les classes : " + e.message
+    createError.value = "Impossible de charger le formulaire : " + e.message
   }
 }
 
@@ -148,7 +181,10 @@ async function submitCreate() {
     await createInscription({
       eleve_nid: newEleve.value.id,
       classe_tid: newClasseTid.value,
-      annee_scolaire: newAnnee.value
+      annee_scolaire: newAnnee.value,
+      droit_inscription: newDroitInscription.value,
+      date_de_payement: newDatePayement.value,
+      montant: newMontant.value || 0
     })
     showCreate.value = false
     await reload()

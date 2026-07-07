@@ -1,7 +1,7 @@
 <template>
   <section>
     <div class="page-header">
-      <h1 class="page-title">Les archives des élèves</h1>
+      <h1 class="page-title">Fiche des élèves</h1>
       <button type="button" class="btn-add" @click="openCreate">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M12 5v14M5 12h14" />
