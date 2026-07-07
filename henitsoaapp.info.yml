@@ -1,0 +1,12 @@
+name: 'Henitsoa App'
+type: theme
+description: 'Interface applicative Vue.js pour la gestion scolaire Henitsoa (élèves, classes, écolages).'
+core_version_requirement: ^9.5 || ^10 || ^11
+base theme: classy
+package: Custom
+
+libraries:
+  - henitsoaapp/global
+
+regions:
+  content: Content
