@@ -35,11 +35,11 @@
       <div v-if="nouveauxItems.length" class="preview-section">
         <div class="preview-section__header">
           <h2>Nouveaux élèves</h2>
-          <router-link to="/app/archives-eleves">Voir les fiches</router-link>
+          <router-link to="/app/eleves-inscrits">Voir les inscriptions</router-link>
         </div>
         <ul class="preview-list">
-          <li v-for="item in nouveauxItems" :key="item.id">
-            <router-link :to="`/app/archives-eleves/${item.id}`" class="preview-list__item">
+          <li v-for="item in nouveauxItems" :key="item.inscription_id || item.id">
+            <router-link :to="`/app/eleves-inscrits/${item.inscription_id}`" class="preview-list__item">
               <span class="preview-list__name">{{ studentName(item) }}</span>
               <span class="preview-list__meta">{{ item.classe || '—' }}</span>
             </router-link>

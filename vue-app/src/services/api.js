@@ -144,6 +144,34 @@ export function updateCarnetConfig(payload) {
   return authenticatedPatch('/api/config/carnet', payload)
 }
 
+export function getActivites(params = {}) {
+  return api.get('/api/activites', { params })
+}
+
+export function getActiviteFormOptions() {
+  return api.get('/api/activites/form-options')
+}
+
+export function createActivite(payload) {
+  return authenticatedPost('/api/activites', payload)
+}
+
+export function getActiviteDetail(id) {
+  return api.get(`/api/activites/${id}`)
+}
+
+export function updateActivite(id, payload) {
+  return authenticatedPatch(`/api/activites/${id}`, payload)
+}
+
+export function createActiviteParticipation(id, payload) {
+  return authenticatedPost(`/api/activites/${id}/participations`, payload)
+}
+
+export function createActivitePaiement(id, payload) {
+  return authenticatedPost(`/api/activites/${id}/paiements`, payload)
+}
+
 export async function getLoginStatus() {
   const bodyLogged = document.body.classList.contains('user-logged-in')
   const uid = Number(window?.drupalSettings?.user?.uid || 0)

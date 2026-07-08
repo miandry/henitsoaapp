@@ -10,10 +10,21 @@
       <div class="stat-card__value">{{ stats.total_inscrits ?? 0 }}</div>
       <div class="stat-card__label">Élèves inscrits</div>
       <div v-if="showClasse && parClasse.length" class="stat-card__popover">
-        <div v-for="row in parClasse" :key="row.classe" class="stat-card__popover-row">
-          <span>{{ row.classe }}</span>
-          <strong>{{ row.count }}</strong>
-        </div>
+        <template v-for="row in parClasse" :key="row.classe">
+          <router-link
+            v-if="row.id"
+            :to="`/app/classes/${row.id}`"
+            class="stat-card__popover-row stat-card__popover-row--link"
+            @click.stop="showClasse = false"
+          >
+            <span>{{ row.classe }}</span>
+            <strong>{{ row.count }}</strong>
+          </router-link>
+          <div v-else class="stat-card__popover-row">
+            <span>{{ row.classe }}</span>
+            <strong>{{ row.count }}</strong>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -132,6 +143,18 @@ function formatMontant(value) {
   padding: 6px 8px;
   font-size: 12px;
   border-bottom: 1px solid var(--color-border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.stat-card__popover-row--link {
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.stat-card__popover-row--link:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .stat-card__popover-row:last-child {

@@ -256,6 +256,7 @@ button.btn-add:hover {
   flex-direction: column;
   gap: 6px;
   margin-bottom: 16px;
+  overflow: visible;
 }
 
 .form-field label {
@@ -264,8 +265,9 @@ button.btn-add:hover {
   color: var(--color-text);
 }
 
-.form-field input,
-.form-field select {
+.form-field input:not([type="checkbox"]):not([type="radio"]),
+.form-field select,
+.form-field textarea {
   width: 100%;
   padding: 9px 12px;
   border: 1px solid var(--color-border);
@@ -275,8 +277,9 @@ button.btn-add:hover {
   background: #fff;
 }
 
-.form-field input:focus,
-.form-field select:focus {
+.form-field input:not([type="checkbox"]):not([type="radio"]):focus,
+.form-field select:focus,
+.form-field textarea:focus {
   outline: none;
   border-color: var(--color-primary);
 }
@@ -374,7 +377,7 @@ a.btn-secondary:hover {
   box-shadow: var(--shadow-md);
   max-height: 220px;
   overflow-y: auto;
-  z-index: 5;
+  z-index: 60;
   list-style: none;
   margin: 0;
   padding: 4px;

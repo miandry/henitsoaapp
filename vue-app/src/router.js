@@ -12,6 +12,8 @@ import GestionEcolages from './pages/ecolages/GestionEcolages.vue'
 import SuiviEcolages from './pages/ecolages/SuiviEcolages.vue'
 import EcolageDetail from './pages/ecolages/EcolageDetail.vue'
 import ConfigCarnet from './pages/ConfigCarnet.vue'
+import ActivitesList from './pages/activites/ActivitesList.vue'
+import ActiviteDetail from './pages/activites/ActiviteDetail.vue'
 import LoginPage from './pages/LoginPage.vue'
 
 const routes = [
@@ -30,6 +32,8 @@ const routes = [
   { path: '/app/gestion-ecolages', name: 'gestion-ecolages', component: GestionEcolages },
   { path: '/app/suivi-ecolages', name: 'suivi-ecolages', component: SuiviEcolages },
   { path: '/app/suivi-ecolages/:id', name: 'ecolage-detail', component: EcolageDetail },
+  { path: '/app/activites', name: 'activites', component: ActivitesList },
+  { path: '/app/activites/:id', name: 'activite-detail', component: ActiviteDetail },
   { path: '/app/config-carnet', name: 'config-carnet', component: ConfigCarnet }
 ]
 

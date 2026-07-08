@@ -24,8 +24,9 @@
 import { ref } from 'vue'
 import { getInscriptions } from '../services/api.js'
 
-defineProps({
-  modelValue: { type: Object, default: null }
+const props = defineProps({
+  modelValue: { type: Object, default: null },
+  anneeScolaire: { type: String, default: '' }
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -40,7 +41,11 @@ function onInput() {
     return
   }
   searchTimeout = setTimeout(async () => {
-    const { data } = await getInscriptions({ search: query.value.trim(), limit: 8 })
+    const params = { search: query.value.trim(), limit: 8 }
+    if (props.anneeScolaire) {
+      params.annee_scolaire = props.anneeScolaire
+    }
+    const { data } = await getInscriptions(params)
     results.value = data.items || []
   }, 250)
 }

@@ -30,10 +30,11 @@ defineEmits(['close'])
   inset: 0;
   background: rgba(15, 23, 42, 0.45);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 50;
-  padding: 16px;
+  padding: 5vh 16px;
+  overflow-y: auto;
 }
 
 .modal-card {
@@ -42,8 +43,9 @@ defineEmits(['close'])
   background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
-  max-height: 90vh;
-  overflow-y: auto;
+  margin: 0 auto;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .modal-card--wide {
@@ -82,5 +84,6 @@ defineEmits(['close'])
 
 .modal-body {
   padding: 20px;
+  overflow: visible;
 }
 </style>

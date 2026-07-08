@@ -12,12 +12,9 @@
 
     <div class="list-card">
       <div class="list-toolbar">
-        <input
-          v-model="search"
-          type="search"
-          placeholder="Rechercher un élève..."
-          @input="onSearchInput"
-        />
+        <select v-model="anneeScolaire" @change="reload">
+          <option v-for="y in anneesScolaires" :key="y" :value="y">{{ y }}</option>
+        </select>
         <span class="total">{{ total }} inscription(s)</span>
       </div>
 
@@ -32,8 +29,6 @@
             <div class="student-list-item__name">{{ item.matricule }}</div>
             <div class="student-list-item__meta">
               <span class="student-badge">{{ item.classe || '—' }}</span>
-              <span class="dot">•</span>
-              <span>{{ item.annee_scolaire || '—' }}</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -114,14 +109,13 @@ import Modal from '../../components/Modal.vue'
 import StudentAutocomplete from '../../components/StudentAutocomplete.vue'
 import ClickableListItem from '../../components/ClickableListItem.vue'
 
-const search = ref('')
+const anneeScolaire = ref('')
+const anneesScolaires = ref([])
 
 const { items, total, loading, loadingMore, error, sentinelRef, reload } = useInfiniteList(
   async (params) => (await getInscriptions(params)).data,
-  { getParams: () => ({ search: search.value }) }
+  { getParams: () => ({ annee_scolaire: anneeScolaire.value }) }
 )
-
-let searchTimeout = null
 
 const showCreate = ref(false)
 const newEleve = ref(null)
@@ -131,20 +125,24 @@ const newDroitInscription = ref('')
 const newDatePayement = ref('')
 const newMontant = ref(null)
 const classes = ref([])
-const anneesScolaires = ref([])
 const droitsInscription = ref([])
 const creating = ref(false)
 const createError = ref('')
-
-function onSearchInput() {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(reload, 300)
-}
 
 function initials(name) {
   if (!name) return '?'
   const parts = name.trim().split(/\s+/)
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase()
+}
+
+async function loadOptions() {
+  try {
+    const { data } = await getClasses({})
+    anneesScolaires.value = data.annees_scolaires || []
+    anneeScolaire.value = data.annee_scolaire || anneesScolaires.value[0] || ''
+  } catch {
+    // Options fallback handled by backend defaults.
+  }
 }
 
 async function openCreate() {
@@ -162,9 +160,11 @@ async function openCreate() {
       getInscriptionFormOptions()
     ])
     classes.value = classesRes.data.items || []
-    anneesScolaires.value = formRes.data.annees_scolaires || classesRes.data.annees_scolaires || []
+    if (!anneesScolaires.value.length) {
+      anneesScolaires.value = formRes.data.annees_scolaires || classesRes.data.annees_scolaires || []
+    }
     droitsInscription.value = formRes.data.droits_inscription || []
-    newAnnee.value = formRes.data.annee_scolaire || classesRes.data.annee_scolaire || anneesScolaires.value[0] || ''
+    newAnnee.value = anneeScolaire.value || formRes.data.annee_scolaire || classesRes.data.annee_scolaire || anneesScolaires.value[0] || ''
   } catch (e) {
     createError.value = "Impossible de charger le formulaire : " + e.message
   }
@@ -195,5 +195,14 @@ async function submitCreate() {
   }
 }
 
-onMounted(reload)
+onMounted(async () => {
+  await loadOptions()
+  await reload()
+})
 </script>
+
+<style scoped>
+.list-toolbar select {
+  min-width: 180px;
+}
+</style>
