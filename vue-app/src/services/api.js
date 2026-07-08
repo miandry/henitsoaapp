@@ -117,6 +117,21 @@ export function getMatiereDetail(id) {
   return api.get(`/api/matieres/${id}`)
 }
 
+export function getEcolageSuivi(params = {}) {
+  return api.get('/api/ecolages/suivi', { params })
+}
+
+export function getEcolageSuiviHistory(inscriptionId) {
+  return api.get(`/api/ecolages/suivi/${inscriptionId}/history`)
+}
+
+export function exportEcolageSuivi(params = {}) {
+  return api.get('/api/ecolages/suivi/export', {
+    params,
+    responseType: 'blob'
+  })
+}
+
 export function getEcolageDetail(id) {
   return api.get(`/api/ecolages/${id}`)
 }

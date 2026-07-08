@@ -108,11 +108,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { getArchives, createEtudiant } from '../../services/api.js'
 import { useInfiniteList } from '../../composables/useInfiniteList.js'
 import Modal from '../../components/Modal.vue'
 import ClickableListItem from '../../components/ClickableListItem.vue'
 
+const route = useRoute()
 const search = ref('')
 const adresse = ref('')
 
@@ -193,5 +195,10 @@ async function submitCreate() {
   }
 }
 
-onMounted(reload)
+onMounted(() => {
+  if (route.query.search) {
+    search.value = String(route.query.search)
+  }
+  reload()
+})
 </script>

@@ -137,11 +137,19 @@
 
       <div class="detail-card">
         <h2 class="detail-section-title">Écolages {{ item.annee_scolaire }}</h2>
+        <p class="ecolage-hint">Cliquez sur un mois pour enregistrer ou voir le paiement.</p>
         <div class="months-grid">
-          <div v-for="m in item.ecolage_months" :key="m.id" class="month-chip" :class="{ 'is-paid': m.paid }">
+          <button
+            v-for="m in item.ecolage_months"
+            :key="m.id"
+            type="button"
+            class="month-chip month-chip--clickable"
+            :class="{ 'is-paid': m.paid }"
+            @click="onMonthClick(m)"
+          >
             <span class="dot-icon"></span>
             {{ m.nom }}
-          </div>
+          </button>
         </div>
       </div>
     </template>
@@ -201,6 +209,25 @@
         </div>
       </form>
     </Modal>
+
+    <PaymentModal
+      v-if="payMonth"
+      :row="paymentRow"
+      :mois="item?.ecolage_months || []"
+      :modes-paiement="modesPaiement"
+      :annee-scolaire="item?.annee_scolaire || ''"
+      :initial-mois-id="payMonth.id"
+      lock-mois
+      @close="payMonth = null"
+      @saved="onPaymentSaved"
+    />
+
+    <EcolageMonthDetail
+      v-if="detailMonth"
+      :month="detailMonth"
+      :payment="detailMonth.payment"
+      @close="detailMonth = null"
+    />
   </section>
 </template>
 
@@ -211,9 +238,12 @@ import {
   getInscriptionDetail,
   updateInscription,
   getClasses,
-  getInscriptionFormOptions
+  getInscriptionFormOptions,
+  getEcolageFormOptions
 } from '../../services/api.js'
 import Modal from '../../components/Modal.vue'
+import PaymentModal from '../../components/ecolages/PaymentModal.vue'
+import EcolageMonthDetail from '../../components/ecolages/EcolageMonthDetail.vue'
 
 const route = useRoute()
 const item = ref(null)
@@ -225,6 +255,22 @@ const editError = ref('')
 const classes = ref([])
 const anneesScolaires = ref([])
 const droitsInscription = ref([])
+const payMonth = ref(null)
+const detailMonth = ref(null)
+const modesPaiement = ref([
+  { value: 'especes', label: 'Espèces' },
+  { value: 'mobile_money', label: 'Mobile Money' },
+  { value: 'virement', label: 'Virement' }
+])
+
+const paymentRow = computed(() => {
+  if (!item.value) return null
+  return {
+    inscription_id: item.value.id,
+    eleve: fullName.value,
+    monthly_fee: 25000
+  }
+})
 
 const form = reactive({
   classe_tid: '',
@@ -296,6 +342,26 @@ function closeEdit() {
   showEdit.value = false
 }
 
+function onMonthClick(month) {
+  if (month.paid && month.payment) {
+    detailMonth.value = month
+    payMonth.value = null
+  } else {
+    payMonth.value = month
+    detailMonth.value = null
+  }
+}
+
+async function onPaymentSaved() {
+  payMonth.value = null
+  await loadItem()
+}
+
+async function loadItem() {
+  const { data } = await getInscriptionDetail(route.params.id)
+  item.value = data.item
+}
+
 async function submitEdit() {
   saving.value = true
   editError.value = ''
@@ -319,8 +385,13 @@ async function submitEdit() {
 
 onMounted(async () => {
   try {
-    const { data } = await getInscriptionDetail(route.params.id)
-    item.value = data.item
+    await loadItem()
+    const { data: formRes } = await getEcolageFormOptions()
+    modesPaiement.value = [
+      { value: 'especes', label: 'Espèces' },
+      { value: 'mobile_money', label: 'Mobile Money' },
+      { value: 'virement', label: 'Virement' }
+    ]
   } catch (e) {
     error.value = e.response?.data?.message || "Impossible de charger l'inscription : " + e.message
   } finally {
@@ -328,3 +399,27 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.ecolage-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.month-chip--clickable {
+  cursor: pointer;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.month-chip--clickable:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.month-chip--clickable.is-paid:hover {
+  border-color: #16a34a;
+}
+</style>
