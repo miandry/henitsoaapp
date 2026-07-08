@@ -40,8 +40,8 @@ export function getInscriptionFormOptions() {
   return api.get('/api/inscriptions/form-options')
 }
 
-export function getDashboardStats() {
-  return api.get('/api/dashboard')
+export function getDashboardStats(params = {}) {
+  return api.get('/api/dashboard', { params })
 }
 
 export function getArchives(params = {}) {

@@ -78,7 +78,9 @@ function studentName(item) {
   return [item.nom, item.prenom].filter(Boolean).join(' ').trim() || item.matricule
 }
 
-onMounted(async () => {
+async function loadDashboard() {
+  loading.value = true
+  error.value = ''
   try {
     const { data } = await getDashboardStats()
     anneeScolaire.value = data.annee_scolaire || ''
@@ -95,7 +97,9 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(loadDashboard)
 </script>
 
 <style scoped>

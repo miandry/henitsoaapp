@@ -14,6 +14,19 @@
 
       <form @submit.prevent="submit">
         <div class="form-field">
+          <label for="school-year">Année scolaire globale</label>
+          <select id="school-year" v-model="selectedSchoolYear">
+            <option value="">Sélectionner une année</option>
+            <option v-for="year in schoolYearOptions" :key="year" :value="year">
+              {{ year }}
+            </option>
+          </select>
+          <p class="field-hint">
+            Cette année sera utilisée par défaut dans les affichages et actions du système.
+          </p>
+        </div>
+
+        <div class="form-field">
           <label for="carnet-path">Chemin du template carnet.docx</label>
           <input
             id="carnet-path"
@@ -74,19 +87,25 @@ const saving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
 const templatePath = ref('')
+const selectedSchoolYear = ref('')
+const schoolYearOptions = ref([])
 const config = ref({
   template_path: '',
   default_path: '',
   active_path: '',
   resolved_path: null,
   exists: false,
-  uses_default: true
+  uses_default: true,
+  selected_school_year: '',
+  school_year_options: []
 })
 
 async function loadConfig() {
   const { data } = await getCarnetConfig()
   config.value = data.item
   templatePath.value = data.item.template_path || ''
+  selectedSchoolYear.value = data.item.selected_school_year || ''
+  schoolYearOptions.value = data.item.school_year_options || []
 }
 
 function useDefaultPath() {
@@ -98,9 +117,14 @@ async function submit() {
   saveError.value = ''
   saveSuccess.value = ''
   try {
-    const { data } = await updateCarnetConfig({ template_path: templatePath.value.trim() })
+    const { data } = await updateCarnetConfig({
+      template_path: templatePath.value.trim(),
+      selected_school_year: selectedSchoolYear.value
+    })
     config.value = data.item
     templatePath.value = data.item.template_path || ''
+    selectedSchoolYear.value = data.item.selected_school_year || ''
+    schoolYearOptions.value = data.item.school_year_options || []
     saveSuccess.value = 'Configuration enregistrée.'
   } catch (e) {
     saveError.value = e.response?.data?.message || "Impossible d'enregistrer : " + e.message
