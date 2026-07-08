@@ -15,6 +15,7 @@ import ConfigCarnet from './pages/ConfigCarnet.vue'
 import LoginPage from './pages/LoginPage.vue'
 
 const routes = [
+  { path: '/', redirect: '/app/dashboard' },
   { path: '/app', redirect: '/app/dashboard' },
   { path: '/app/login', name: 'login', component: LoginPage },
   { path: '/app/dashboard', name: 'dashboard', component: Dashboard },
