@@ -57,7 +57,7 @@ const baseItems = [
   { path: '/app/matieres', label: 'Les matieres', icon: icons.matieres },
   { path: '/app/gestion-ecolages', label: 'Gestion des ecolages', icon: icons.ecolageGestion },
   { path: '/app/suivi-ecolages', label: 'Suivi des ecolages', icon: icons.ecolageSuivi },
-  { path: '/app/config-carnet', label: 'Config carnet', icon: icons.config }
+  { path: '/app/config-carnet', label: 'Configuration', icon: icons.config }
 ]
 
 const isLogged = ref(document.body.classList.contains('user-logged-in'))
@@ -81,7 +81,7 @@ onUnmounted(() => {
 
 const items = computed(() => {
   const authItem = isLogged.value
-    ? { path: '/user/logout?destination=/app/login', label: 'Deconnexion', icon: '', external: true }
+    ? { path: '/user/logout?destination=/app/login', label: 'Deconnexion', icon: icons.logout, external: true }
     : { path: '/app/login', label: 'Login', icon: icons.login }
   return [...baseItems, authItem]
 })
