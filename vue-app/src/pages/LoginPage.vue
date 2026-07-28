@@ -37,17 +37,24 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { getLoginStatus } from '../services/api.js'
 
 const router = useRouter()
+const route = useRoute()
 const name = ref('')
 const pass = ref('')
 const submitting = ref(false)
 const errorMessage = ref('')
 
-onMounted(() => {
-  if (document.body.classList.contains('user-logged-in')) {
-    router.replace('/app/dashboard')
+function redirectAfterLogin() {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/app/dashboard'
+  return redirect.startsWith('/app') ? redirect : '/app/dashboard'
+}
+
+onMounted(async () => {
+  if (await getLoginStatus()) {
+    router.replace(redirectAfterLogin())
   }
 })
 
@@ -75,8 +82,11 @@ async function submitLogin() {
     }
 
     document.body.classList.add('user-logged-in')
+    if (window.drupalSettings?.user) {
+      window.drupalSettings.user.uid = Number(data?.current_user?.uid || 1)
+    }
     window.dispatchEvent(new CustomEvent('auth-changed'))
-    router.replace('/app/dashboard')
+    router.replace(redirectAfterLogin())
   } catch (error) {
     errorMessage.value = "Connexion impossible. Verifiez votre reseau."
   } finally {

@@ -183,5 +183,8 @@ export function createActivitePaiement(id, payload) {
 export async function getLoginStatus() {
   const bodyLogged = document.body.classList.contains('user-logged-in')
   const uid = Number(window?.drupalSettings?.user?.uid || 0)
-  return bodyLogged || uid > 0
+  if (bodyLogged || uid > 0) {
+    return true
+  }
+  return false
 }

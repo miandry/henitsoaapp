@@ -16,11 +16,12 @@ import ConfigCarnet from './pages/ConfigCarnet.vue'
 import ActivitesList from './pages/activites/ActivitesList.vue'
 import ActiviteDetail from './pages/activites/ActiviteDetail.vue'
 import LoginPage from './pages/LoginPage.vue'
+import { getLoginStatus } from './services/api.js'
 
 const routes = [
   { path: '/', redirect: '/app/dashboard' },
   { path: '/app', redirect: '/app/dashboard' },
-  { path: '/app/login', name: 'login', component: LoginPage },
+  { path: '/app/login', name: 'login', component: LoginPage, meta: { public: true } },
   { path: '/app/dashboard', name: 'dashboard', component: Dashboard },
   { path: '/app/eleves-inscrits', name: 'eleves-inscrits', component: ElevesInscrits },
   { path: '/app/eleves-inscrits/:id', name: 'inscription-detail', component: InscriptionDetail },
@@ -39,7 +40,28 @@ const routes = [
   { path: '/app/config-carnet', name: 'config-carnet', component: ConfigCarnet }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+router.beforeEach(async (to) => {
+  const isPublic = to.matched.some((record) => record.meta.public)
+  const isLogged = await getLoginStatus()
+
+  if (!isPublic && !isLogged) {
+    return {
+      path: '/app/login',
+      query: to.fullPath !== '/app/login' ? { redirect: to.fullPath } : undefined
+    }
+  }
+
+  if (to.path === '/app/login' && isLogged) {
+    const redirect = typeof to.query.redirect === 'string' ? to.query.redirect : '/app/dashboard'
+    return redirect.startsWith('/app') ? redirect : '/app/dashboard'
+  }
+
+  return true
+})
+
+export default router

@@ -82,10 +82,13 @@ onUnmounted(() => {
 })
 
 const items = computed(() => {
-  const authItem = isLogged.value
-    ? { path: '/user/logout?destination=/app/login', label: 'Deconnexion', icon: icons.logout, external: true }
-    : { path: '/app/login', label: 'Login', icon: icons.login }
-  return [...baseItems, authItem]
+  if (!isLogged.value) {
+    return []
+  }
+  return [
+    ...baseItems,
+    { path: '/user/logout?destination=/app/login', label: 'Deconnexion', icon: icons.logout, external: true }
+  ]
 })
 
 function isActive(path) {

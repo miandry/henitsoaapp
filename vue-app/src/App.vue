@@ -1,7 +1,13 @@
 <template>
-  <div class="shell">
+  <div class="shell" :class="{ 'shell--login': isLoginPage }">
     <header class="shell__header">
-      <button class="shell__burger" type="button" aria-label="Ouvrir le menu" @click="sidebarOpen = !sidebarOpen">
+      <button
+        v-if="isLogged"
+        class="shell__burger"
+        type="button"
+        aria-label="Ouvrir le menu"
+        @click="sidebarOpen = !sidebarOpen"
+      >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
@@ -13,24 +19,11 @@
           <div class="shell__subtitle">Gestion des élèves du collège</div>
         </div>
       </div>
-      <router-link
-        v-if="!isLogged"
-        class="shell__user-btn"
-        to="/app/login"
-        title="Se connecter"
-        aria-label="Se connecter"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-          <path d="M10 17l5-5-5-5"></path>
-          <path d="M15 12H3"></path>
-        </svg>
-      </router-link>
     </header>
 
     <div class="shell__body">
-      <Sidebar :open="sidebarOpen" @navigate="sidebarOpen = false" />
-      <div v-if="sidebarOpen" class="shell__backdrop" @click="sidebarOpen = false"></div>
+      <Sidebar v-if="isLogged" :open="sidebarOpen" @navigate="sidebarOpen = false" />
+      <div v-if="isLogged && sidebarOpen" class="shell__backdrop" @click="sidebarOpen = false"></div>
       <main class="shell__content">
         <router-view />
       </main>
@@ -39,7 +32,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import { getLoginStatus } from './services/api'
@@ -48,6 +41,7 @@ const sidebarOpen = ref(false)
 const route = useRoute()
 const logoUrl = '/sites/default/files/logo_henitsoa.jpeg'
 const isLogged = ref(document.body.classList.contains('user-logged-in'))
+const isLoginPage = computed(() => route.path === '/app/login')
 
 async function refreshLoginState() {
   try {
@@ -91,22 +85,6 @@ watch(() => route.path, () => {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   z-index: 40;
-}
-
-.shell__user-btn {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.shell__user-btn:hover {
-  background: var(--color-bg);
 }
 
 .shell__burger {
