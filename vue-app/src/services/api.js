@@ -72,6 +72,14 @@ export function createEtudiant(payload) {
   return authenticatedPost('/api/etudiants', payload)
 }
 
+export function searchParents(params = {}) {
+  return api.get('/api/parents', { params })
+}
+
+export function createParent(payload) {
+  return authenticatedPost('/api/parents', payload)
+}
+
 export function getEcolages(params = {}) {
   return api.get('/api/ecolages', { params })
 }

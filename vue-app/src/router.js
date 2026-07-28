@@ -4,6 +4,7 @@ import ElevesInscrits from './pages/eleves/ElevesInscrits.vue'
 import InscriptionDetail from './pages/eleves/InscriptionDetail.vue'
 import ArchivesEleves from './pages/eleves/ArchivesEleves.vue'
 import ArchiveDetail from './pages/eleves/ArchiveDetail.vue'
+import ArchiveEdit from './pages/eleves/ArchiveEdit.vue'
 import Classes from './pages/classes/Classes.vue'
 import ClasseDetail from './pages/classes/ClasseDetail.vue'
 import Matieres from './pages/Matieres.vue'
@@ -26,6 +27,7 @@ const routes = [
   { path: '/app/classes', name: 'classes', component: Classes },
   { path: '/app/classes/:id', name: 'classe-detail', component: ClasseDetail },
   { path: '/app/archives-eleves', name: 'archives-eleves', component: ArchivesEleves },
+  { path: '/app/archives-eleves/:id/edit', name: 'archive-edit', component: ArchiveEdit },
   { path: '/app/archives-eleves/:id', name: 'archive-detail', component: ArchiveDetail },
   { path: '/app/matieres', name: 'matieres', component: Matieres },
   { path: '/app/matieres/:id', name: 'matiere-detail', component: MatiereDetail },
