@@ -1,8 +1,7 @@
 <template>
-  <div class="shell" :class="{ 'shell--login': isLoginPage }">
+  <div class="shell">
     <header class="shell__header">
       <button
-        v-if="isLogged"
         class="shell__burger"
         type="button"
         aria-label="Ouvrir le menu"
@@ -22,8 +21,8 @@
     </header>
 
     <div class="shell__body">
-      <Sidebar v-if="isLogged" :open="sidebarOpen" @navigate="sidebarOpen = false" />
-      <div v-if="isLogged && sidebarOpen" class="shell__backdrop" @click="sidebarOpen = false"></div>
+      <Sidebar :open="sidebarOpen" @navigate="sidebarOpen = false" />
+      <div v-if="sidebarOpen" class="shell__backdrop" @click="sidebarOpen = false"></div>
       <main class="shell__content">
         <router-view />
       </main>
@@ -32,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import { getLoginStatus } from './services/api'
@@ -41,13 +40,16 @@ const sidebarOpen = ref(false)
 const route = useRoute()
 const logoUrl = '/sites/default/files/logo_henitsoa.jpeg'
 const isLogged = ref(document.body.classList.contains('user-logged-in'))
-const isLoginPage = computed(() => route.path === '/app/login')
 
 async function refreshLoginState() {
   try {
     isLogged.value = await getLoginStatus()
   } catch (error) {
     isLogged.value = document.body.classList.contains('user-logged-in')
+  }
+  if (!isLogged.value) {
+    const destination = encodeURIComponent(route.fullPath.startsWith('/app') ? route.fullPath : '/app/dashboard')
+    window.location.href = `/user/login?destination=${destination}`
   }
 }
 

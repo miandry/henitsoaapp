@@ -87,7 +87,7 @@ const items = computed(() => {
   }
   return [
     ...baseItems,
-    { path: '/user/logout?destination=/app/login', label: 'Deconnexion', icon: icons.logout, external: true }
+    { path: '/user/logout?destination=/user/login', label: 'Deconnexion', icon: icons.logout, external: true }
   ]
 })
 
