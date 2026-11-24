@@ -19,7 +19,7 @@
           <input
             v-model="search"
             type="search"
-            placeholder="Rechercher nom, matricule, classe..."
+            placeholder="Nom, matricule, classe, parent, tél, adresse..."
             @input="onSearchInput"
           />
         </div>
