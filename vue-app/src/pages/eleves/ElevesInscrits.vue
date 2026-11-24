@@ -12,9 +12,17 @@
 
     <div class="list-card">
       <div class="list-toolbar">
-        <select v-model="anneeScolaire" @change="reload">
-          <option v-for="y in anneesScolaires" :key="y" :value="y">{{ y }}</option>
-        </select>
+        <div class="list-toolbar-filters">
+          <select v-model="anneeScolaire" @change="reload">
+            <option v-for="y in anneesScolaires" :key="y" :value="y">{{ y }}</option>
+          </select>
+          <input
+            v-model="search"
+            type="search"
+            placeholder="Rechercher nom, matricule, classe..."
+            @input="onSearchInput"
+          />
+        </div>
         <span class="total">{{ total }} inscription(s)</span>
       </div>
 
@@ -111,11 +119,23 @@ import ClickableListItem from '../../components/ClickableListItem.vue'
 
 const anneeScolaire = ref('')
 const anneesScolaires = ref([])
+const search = ref('')
+let searchTimeout = null
 
 const { items, total, loading, loadingMore, error, sentinelRef, reload } = useInfiniteList(
   async (params) => (await getInscriptions(params)).data,
-  { getParams: () => ({ annee_scolaire: anneeScolaire.value }) }
+  {
+    getParams: () => ({
+      annee_scolaire: anneeScolaire.value,
+      search: search.value.trim() || undefined
+    })
+  }
 )
+
+function onSearchInput() {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(reload, 300)
+}
 
 const showCreate = ref(false)
 const newEleve = ref(null)
@@ -203,6 +223,11 @@ onMounted(async () => {
 
 <style scoped>
 .list-toolbar select {
-  min-width: 180px;
+  min-width: 160px;
+}
+
+.list-toolbar-filters input[type='search'] {
+  min-width: 220px;
+  flex: 1;
 }
 </style>
