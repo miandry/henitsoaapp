@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { writeFileSync } from 'fs'
-
-const THEME_BASE = '/themes/custom/henitsoaapp/dist/'
+import { createHash } from 'crypto'
+import { readFileSync } from 'fs'
 
 // Injects the theme's real css/style.css into the Vite dev server.
 function injectThemeCss() {
@@ -16,28 +16,33 @@ function injectThemeCss() {
   }
 }
 
-// After build, rewrite henitsoaapp.libraries.yml to point at hashed ES module assets.
+/**
+ * Drupal-friendly build:
+ * - Single classic IIFE bundle (dist/app.js) — no type=module, no chunk base-path issues
+ *   (prod theme lives at /themes/henitsoaapp, local at /themes/custom/henitsoaapp).
+ * - Stable filenames expected by production libraries.yml.
+ * - Cache-bust via libraries version hash.
+ */
 function writeDrupalLibraries() {
   return {
     name: 'write-drupal-libraries',
-    writeBundle(_options, bundle) {
-      const jsFile = Object.keys(bundle).find((name) => name.endsWith('.js') && bundle[name].isEntry)
-      const cssFile = Object.keys(bundle).find((name) => name.endsWith('.css'))
-      if (!jsFile) return
+    closeBundle() {
+      const jsPath = resolve(__dirname, '../dist/app.js')
+      let version = Date.now().toString(36)
+      try {
+        version = createHash('md5').update(readFileSync(jsPath)).digest('hex').slice(0, 12)
+      } catch {
+        // File may not exist yet in odd build states.
+      }
 
-      const version = jsFile.replace(/[^a-zA-Z0-9]/g, '').slice(-12) || Date.now().toString(36)
       const yaml = `global:
   version: '${version}'
   js:
-    dist/${jsFile}:
-      preprocess: false
-      minified: true
-      attributes:
-        type: module
+    dist/app.js: { preprocess: false, minified: true }
   css:
     theme:
       css/style.css: {}
-${cssFile ? `      dist/${cssFile}: { preprocess: false }` : ''}
+      dist/assets/main.css: { preprocess: false }
   dependencies:
     - core/drupal
     - core/drupalSettings
@@ -49,9 +54,9 @@ ${cssFile ? `      dist/${cssFile}: { preprocess: false }` : ''}
 
 export default defineConfig({
   plugins: [vue(), injectThemeCss(), writeDrupalLibraries()],
-  // Critical for Drupal: lazy chunks must load from the theme dist path,
-  // not from site-root /assets/...
-  base: THEME_BASE,
+  // Relative base keeps dynamic imports portable; with inlineDynamicImports
+  // there are no extra chunks anyway.
+  base: './',
   server: {
     fs: {
       allow: ['..']
@@ -65,19 +70,19 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, '../dist'),
     emptyOutDir: true,
+    cssCodeSplit: false,
     rollupOptions: {
       input: resolve(__dirname, 'src/main.js'),
       output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]',
-        manualChunks(id) {
-          if (id.includes('node_modules/chart.js')) {
-            return 'chart'
+        format: 'iife',
+        name: 'HenitsoaApp',
+        inlineDynamicImports: true,
+        entryFileNames: 'app.js',
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return 'assets/main.css'
           }
-          if (id.includes('node_modules/vue') || id.includes('node_modules/vue-router') || id.includes('node_modules/axios')) {
-            return 'vendor'
-          }
+          return 'assets/[name][extname]'
         }
       }
     }

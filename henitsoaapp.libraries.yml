@@ -1,15 +1,11 @@
 global:
-  version: 'inCL4f5IJfjs'
+  version: '4f0b81b2d082'
   js:
-    dist/assets/main-CL4f5IJf.js:
-      preprocess: false
-      minified: true
-      attributes:
-        type: module
+    dist/app.js: { preprocess: false, minified: true }
   css:
     theme:
       css/style.css: {}
-      dist/assets/main-DWpu4Xx0.css: { preprocess: false }
+      dist/assets/main.css: { preprocess: false }
   dependencies:
     - core/drupal
     - core/drupalSettings
