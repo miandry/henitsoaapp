@@ -1,41 +1,89 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from './pages/Dashboard.vue'
-import ElevesInscrits from './pages/eleves/ElevesInscrits.vue'
-import InscriptionDetail from './pages/eleves/InscriptionDetail.vue'
-import ArchivesEleves from './pages/eleves/ArchivesEleves.vue'
-import ArchiveDetail from './pages/eleves/ArchiveDetail.vue'
-import ArchiveEdit from './pages/eleves/ArchiveEdit.vue'
-import Classes from './pages/classes/Classes.vue'
-import ClasseDetail from './pages/classes/ClasseDetail.vue'
-import Matieres from './pages/Matieres.vue'
-import MatiereDetail from './pages/MatiereDetail.vue'
-import GestionEcolages from './pages/ecolages/GestionEcolages.vue'
-import SuiviEcolages from './pages/ecolages/SuiviEcolages.vue'
-import EcolageDetail from './pages/ecolages/EcolageDetail.vue'
-import ConfigCarnet from './pages/ConfigCarnet.vue'
-import ActivitesList from './pages/activites/ActivitesList.vue'
-import ActiviteDetail from './pages/activites/ActiviteDetail.vue'
 import { getLoginStatus } from './services/api.js'
 
 const routes = [
   { path: '/', redirect: '/app/dashboard' },
   { path: '/app', redirect: '/app/dashboard' },
-  { path: '/app/dashboard', name: 'dashboard', component: Dashboard },
-  { path: '/app/eleves-inscrits', name: 'eleves-inscrits', component: ElevesInscrits },
-  { path: '/app/eleves-inscrits/:id', name: 'inscription-detail', component: InscriptionDetail },
-  { path: '/app/classes', name: 'classes', component: Classes },
-  { path: '/app/classes/:id', name: 'classe-detail', component: ClasseDetail },
-  { path: '/app/archives-eleves', name: 'archives-eleves', component: ArchivesEleves },
-  { path: '/app/archives-eleves/:id/edit', name: 'archive-edit', component: ArchiveEdit },
-  { path: '/app/archives-eleves/:id', name: 'archive-detail', component: ArchiveDetail },
-  { path: '/app/matieres', name: 'matieres', component: Matieres },
-  { path: '/app/matieres/:id', name: 'matiere-detail', component: MatiereDetail },
-  { path: '/app/gestion-ecolages', name: 'gestion-ecolages', component: GestionEcolages },
-  { path: '/app/suivi-ecolages', name: 'suivi-ecolages', component: SuiviEcolages },
-  { path: '/app/suivi-ecolages/:id', name: 'ecolage-detail', component: EcolageDetail },
-  { path: '/app/activites', name: 'activites', component: ActivitesList },
-  { path: '/app/activites/:id', name: 'activite-detail', component: ActiviteDetail },
-  { path: '/app/config-carnet', name: 'config-carnet', component: ConfigCarnet }
+  {
+    path: '/app/dashboard',
+    name: 'dashboard',
+    component: () => import('./pages/Dashboard.vue')
+  },
+  {
+    path: '/app/eleves-inscrits',
+    name: 'eleves-inscrits',
+    component: () => import('./pages/eleves/ElevesInscrits.vue')
+  },
+  {
+    path: '/app/eleves-inscrits/:id',
+    name: 'inscription-detail',
+    component: () => import('./pages/eleves/InscriptionDetail.vue')
+  },
+  {
+    path: '/app/classes',
+    name: 'classes',
+    component: () => import('./pages/classes/Classes.vue')
+  },
+  {
+    path: '/app/classes/:id',
+    name: 'classe-detail',
+    component: () => import('./pages/classes/ClasseDetail.vue')
+  },
+  {
+    path: '/app/archives-eleves',
+    name: 'archives-eleves',
+    component: () => import('./pages/eleves/ArchivesEleves.vue')
+  },
+  {
+    path: '/app/archives-eleves/:id/edit',
+    name: 'archive-edit',
+    component: () => import('./pages/eleves/ArchiveEdit.vue')
+  },
+  {
+    path: '/app/archives-eleves/:id',
+    name: 'archive-detail',
+    component: () => import('./pages/eleves/ArchiveDetail.vue')
+  },
+  {
+    path: '/app/matieres',
+    name: 'matieres',
+    component: () => import('./pages/Matieres.vue')
+  },
+  {
+    path: '/app/matieres/:id',
+    name: 'matiere-detail',
+    component: () => import('./pages/MatiereDetail.vue')
+  },
+  {
+    path: '/app/gestion-ecolages',
+    name: 'gestion-ecolages',
+    component: () => import('./pages/ecolages/GestionEcolages.vue')
+  },
+  {
+    path: '/app/suivi-ecolages',
+    name: 'suivi-ecolages',
+    component: () => import('./pages/ecolages/SuiviEcolages.vue')
+  },
+  {
+    path: '/app/suivi-ecolages/:id',
+    name: 'ecolage-detail',
+    component: () => import('./pages/ecolages/EcolageDetail.vue')
+  },
+  {
+    path: '/app/activites',
+    name: 'activites',
+    component: () => import('./pages/activites/ActivitesList.vue')
+  },
+  {
+    path: '/app/activites/:id',
+    name: 'activite-detail',
+    component: () => import('./pages/activites/ActiviteDetail.vue')
+  },
+  {
+    path: '/app/config-carnet',
+    name: 'config-carnet',
+    component: () => import('./pages/ConfigCarnet.vue')
+  }
 ]
 
 const router = createRouter({

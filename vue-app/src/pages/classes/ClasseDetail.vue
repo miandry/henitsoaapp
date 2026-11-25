@@ -39,7 +39,14 @@
               @click="navigate"
               @keydown.enter="navigate"
             >
-              <img v-if="student.photo_url" :src="student.photo_url" :alt="student.matricule" class="student-avatar student-avatar--photo" />
+              <img
+                v-if="student.photo_url"
+                :src="student.photo_url"
+                :alt="student.matricule"
+                class="student-avatar student-avatar--photo"
+                loading="lazy"
+                decoding="async"
+              />
               <div v-else class="student-avatar">{{ initials(student.matricule) }}</div>
               <div class="student-list-item__info">
                 <div class="student-list-item__name">{{ student.matricule }}</div>

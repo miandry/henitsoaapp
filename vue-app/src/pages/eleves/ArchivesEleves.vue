@@ -30,11 +30,26 @@
       </div>
 
       <p v-if="error" class="list-error">{{ error }}</p>
-      <p v-else-if="loading" class="list-loading">Chargement...</p>
+      <ul v-else-if="loading" class="student-list" aria-busy="true">
+        <li v-for="n in 6" :key="`sk-${n}`" class="student-list-item skeleton-row">
+          <div class="skeleton skeleton-avatar"></div>
+          <div class="skeleton-lines">
+            <div class="skeleton skeleton-line skeleton-line--lg"></div>
+            <div class="skeleton skeleton-line"></div>
+          </div>
+        </li>
+      </ul>
 
       <ul v-else class="student-list">
         <ClickableListItem v-for="item in items" :key="item.id" :to="`/app/archives-eleves/${item.id}`">
-          <img v-if="item.photo_url" :src="item.photo_url" :alt="fullName(item)" class="student-avatar student-avatar--photo" />
+          <img
+            v-if="item.photo_url"
+            :src="item.photo_url"
+            :alt="fullName(item)"
+            class="student-avatar student-avatar--photo"
+            loading="lazy"
+            decoding="async"
+          />
           <div v-else class="student-avatar">{{ initials(item) }}</div>
           <div class="student-list-item__info">
             <div class="student-list-item__name">{{ fullName(item) }}</div>
@@ -119,7 +134,7 @@ const search = ref('')
 const adresse = ref('')
 
 const { items, total, loading, loadingMore, error, sentinelRef, reload } = useInfiniteList(
-  async (params) => (await getArchives(params)).data,
+  async (params, config = {}) => (await getArchives(params, config)).data,
   { getParams: () => ({ search: search.value, adresse: adresse.value }) }
 )
 

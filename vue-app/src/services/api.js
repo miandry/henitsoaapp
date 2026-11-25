@@ -2,20 +2,45 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: '/',
+  timeout: 30000,
   headers: {
     Accept: 'application/json'
   }
 })
 
 let csrfTokenPromise = null
+const inflightGets = new Map()
 
 function getCsrfToken() {
   if (!csrfTokenPromise) {
     csrfTokenPromise = api
       .get('/session/token', { responseType: 'text', headers: { Accept: 'text/plain' } })
       .then((res) => res.data)
+      .catch((error) => {
+        csrfTokenPromise = null
+        throw error
+      })
   }
   return csrfTokenPromise
+}
+
+/**
+ * Deduplicates identical in-flight GET requests and supports AbortSignal.
+ */
+function getDeduped(url, config = {}) {
+  const key = `${url}?${JSON.stringify(config.params || {})}`
+  if (!config.signal && inflightGets.has(key)) {
+    return inflightGets.get(key)
+  }
+  const promise = api.get(url, config).finally(() => {
+    if (inflightGets.get(key) === promise) {
+      inflightGets.delete(key)
+    }
+  })
+  if (!config.signal) {
+    inflightGets.set(key, promise)
+  }
+  return promise
 }
 
 async function authenticatedPost(url, body) {
@@ -28,8 +53,8 @@ async function authenticatedPatch(url, body) {
   return api.patch(url, body, { headers: { 'X-CSRF-Token': token } })
 }
 
-export function getInscriptions(params = {}) {
-  return api.get('/api/inscriptions', { params })
+export function getInscriptions(params = {}, config = {}) {
+  return getDeduped('/api/inscriptions', { ...config, params })
 }
 
 export function createInscription(payload) {
@@ -40,16 +65,16 @@ export function getInscriptionFormOptions() {
   return api.get('/api/inscriptions/form-options')
 }
 
-export function getDashboardStats(params = {}) {
-  return api.get('/api/dashboard', { params })
+export function getDashboardStats(params = {}, config = {}) {
+  return getDeduped('/api/dashboard', { ...config, params })
 }
 
-export function getArchives(params = {}) {
-  return api.get('/api/archives', { params })
+export function getArchives(params = {}, config = {}) {
+  return getDeduped('/api/archives', { ...config, params })
 }
 
-export function getClasses(params = {}) {
-  return api.get('/api/classes', { params })
+export function getClasses(params = {}, config = {}) {
+  return getDeduped('/api/classes', { ...config, params })
 }
 
 export function createClasse(nom) {
@@ -125,8 +150,8 @@ export function getMatiereDetail(id) {
   return api.get(`/api/matieres/${id}`)
 }
 
-export function getEcolageSuivi(params = {}) {
-  return api.get('/api/ecolages/suivi', { params })
+export function getEcolageSuivi(params = {}, config = {}) {
+  return getDeduped('/api/ecolages/suivi', { ...config, params })
 }
 
 export function getEcolageSuiviHistory(inscriptionId) {
@@ -152,8 +177,8 @@ export function updateCarnetConfig(payload) {
   return authenticatedPatch('/api/config/carnet', payload)
 }
 
-export function getActivites(params = {}) {
-  return api.get('/api/activites', { params })
+export function getActivites(params = {}, config = {}) {
+  return getDeduped('/api/activites', { ...config, params })
 }
 
 export function getActiviteFormOptions() {

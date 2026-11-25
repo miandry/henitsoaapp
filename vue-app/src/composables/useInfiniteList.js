@@ -21,37 +21,56 @@ export function useInfiniteList(fetchPage, options = {}) {
 
   let currentPage = 0
   let observer = null
+  let reloadController = null
+  let loadMoreController = null
 
-  async function fetchAndSet(pageNum, append) {
+  async function fetchAndSet(pageNum, append, signal) {
     const params = { page: pageNum, limit, ...(options.getParams ? options.getParams() : {}) }
-    const data = await fetchPage(params)
+    const data = await fetchPage(params, { signal })
+    if (signal?.aborted) return
     items.value = append ? items.value.concat(data.items || []) : (data.items || [])
     total.value = data.total || 0
     currentPage = pageNum
   }
 
   async function reload() {
+    if (reloadController) reloadController.abort()
+    reloadController = typeof AbortController !== 'undefined' ? new AbortController() : null
+    const signal = reloadController?.signal
     loading.value = true
     error.value = ''
     try {
-      await fetchAndSet(0, false)
+      await fetchAndSet(0, false, signal)
     } catch (e) {
+      if (e?.code === 'ERR_CANCELED' || e?.name === 'CanceledError' || e?.name === 'AbortError') {
+        return
+      }
       error.value = e.response?.data?.message || e.message
     } finally {
-      loading.value = false
+      if (!signal || !signal.aborted) {
+        loading.value = false
+      }
     }
   }
 
   async function loadMore() {
     if (loadingMore.value || loading.value) return
     if (items.value.length >= total.value) return
+    if (loadMoreController) loadMoreController.abort()
+    loadMoreController = typeof AbortController !== 'undefined' ? new AbortController() : null
+    const signal = loadMoreController?.signal
     loadingMore.value = true
     try {
-      await fetchAndSet(currentPage + 1, true)
+      await fetchAndSet(currentPage + 1, true, signal)
     } catch (e) {
+      if (e?.code === 'ERR_CANCELED' || e?.name === 'CanceledError' || e?.name === 'AbortError') {
+        return
+      }
       error.value = e.response?.data?.message || e.message
     } finally {
-      loadingMore.value = false
+      if (!signal || !signal.aborted) {
+        loadingMore.value = false
+      }
     }
   }
 
